@@ -179,3 +179,14 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# Project specific
+models/
+logs/
+cache/
+*.pt
+*.pth
+*.onnx
+*.png
+*.jpg
+*.jpeg

@@ -1,0 +1,32 @@
+model:
+  name: "distilbert-base-uncased"
+  dropout: 0.3
+  max_length: 128
+  
+data:
+  dataset_name: "DeepPavlov/clinc150"
+  train_split: "train"
+  val_split: "validation"
+  test_split: "test"
+  batch_size: 16
+  num_workers: 4
+  
+training:
+  num_epochs: 5
+  learning_rate: 2.0e-5
+  warmup_steps: 0
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  seed: 42
+  early_stopping_patience: 5
+  early_stopping_min_delta: 0.001
+  
+evaluation:
+  confidence_threshold: 0.7
+  save_confusion_matrix: true
+  
+paths:
+  model_dir: "models"
+  results_dir: "results"
+  logs_dir: "logs"
+  cache_dir: "cache"
