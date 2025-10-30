@@ -66,6 +66,7 @@ class CLINC150DataLoader:
         self.dataset = load_dataset("DeepPavlov/clinc150", cache_dir=self.cache_dir)
         self._detect_columns()
         self._create_label_mappings()
+        self._load_intent_names()
 
     def _detect_columns(self) -> None:
         features = self.dataset["train"].features
@@ -115,8 +116,13 @@ class CLINC150DataLoader:
             unique_values = sorted(list(all_labels))
             self.value2id = {val: idx for idx, val in enumerate(unique_values)}
             self.id2value = {idx: val for idx, val in enumerate(unique_values)}
-            self.id2label = {idx: str(val) for idx, val in self.id2value.items()}
-            self.label2id = {str(val): idx for idx, val in enumerate(unique_values)}
+            
+            if hasattr(label_feat, 'int2str'):
+                self.id2label = {idx: label_feat.int2str(val) for idx, val in self.id2value.items()}
+                self.label2id = {label_feat.int2str(val): idx for idx, val in enumerate(unique_values)}
+            else:
+                self.id2label = {idx: str(val) for idx, val in self.id2value.items()}
+                self.label2id = {str(val): idx for idx, val in enumerate(unique_values)}
 
     def get_split(self, split: str = "train") -> Tuple[List[str], List[int]]:
         if self.dataset is None:
@@ -152,6 +158,15 @@ class CLINC150DataLoader:
                 clean_labels.append(int(mapped))
 
         return clean_texts, clean_labels
+
+    def _load_intent_names(self) -> None:
+        try:
+            intents_dataset = load_dataset("DeepPavlov/clinc150", "intents", cache_dir=self.cache_dir)
+            intent_mapping = {row['id']: row['name'] for row in intents_dataset['intents']}
+            self.id2label = intent_mapping
+            self.label2id = {name: idx for idx, name in intent_mapping.items()}
+        except Exception:
+            pass
 
     def get_num_labels(self) -> int:
         return len(self.id2label)
